@@ -23,7 +23,7 @@ services:
     networks:
       - project_network
     ports:
-      - 3000:3000
+      - "3000:3000"
     volumes:
       - dbgate-data:/root/.dbgate
     environment:
