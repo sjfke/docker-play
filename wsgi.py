@@ -386,38 +386,6 @@ def flask_config():
     _flask_config["Database"] = _database
     _flask_config["Description"] = "Manually maintained list of Flask configuration values"
 
-
-    _old_flask_config = {
-        "Builtin": {
-            "DEBUG": application.config["DEBUG"],
-            "TESTING": application.config["TESTING"],
-            "PROPAGATE_EXCEPTIONS": application.config["PROPAGATE_EXCEPTIONS"],
-            "TRAP_HTTP_EXCEPTIONS": application.config["TRAP_HTTP_EXCEPTIONS"],
-            "TRAP_BAD_REQUEST_ERRORS": application.config["TRAP_BAD_REQUEST_ERRORS"],
-            "SECRET_KEY": application.config["SECRET_KEY"],
-            "SESSION_COOKIE_NAME": application.config["SESSION_COOKIE_NAME"],
-            "SESSION_COOKIE_DOMAIN": application.config["SESSION_COOKIE_DOMAIN"],
-            "SESSION_COOKIE_PATH": application.config["SESSION_COOKIE_PATH"],
-            "SESSION_COOKIE_HTTPONLY": application.config["SESSION_COOKIE_HTTPONLY"],
-            "SESSION_COOKIE_SECURE": application.config["SESSION_COOKIE_SECURE"],
-            "SESSION_COOKIE_SAMESITE": application.config["SESSION_COOKIE_SAMESITE"],
-            "USE_X_SENDFILE": application.config["USE_X_SENDFILE"],
-            "SEND_FILE_MAX_AGE_DEFAULT": application.config["SEND_FILE_MAX_AGE_DEFAULT"],
-            "SERVER_NAME": application.config["SERVER_NAME"],
-            "APPLICATION_ROOT": application.config["APPLICATION_ROOT"],
-            "PREFERRED_URL_SCHEME": application.config["PREFERRED_URL_SCHEME"],
-            "MAX_CONTENT_LENGTH": application.config["MAX_CONTENT_LENGTH"],
-            "TEMPLATES_AUTO_RELOAD": application.config["TEMPLATES_AUTO_RELOAD"],
-            "EXPLAIN_TEMPLATE_LOADING": application.config["EXPLAIN_TEMPLATE_LOADING"],
-            "MAX_COOKIE_SIZE": application.config["MAX_COOKIE_SIZE"]
-        },
-        "Application": {
-            "MONGO_URI": application.config["MONGO_URI"],
-            "MONGO_DB": application.config["MONGO_DB"]
-        },
-        "Description": "Manually maintained list of Flask configuration values"
-    }
-
     return jsonify(_flask_config), 200
 
 
