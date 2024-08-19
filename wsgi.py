@@ -343,7 +343,7 @@ def test_icons():
 
 ####
 
-@application.route('/flask-config')
+@application.route('/flask-builtin')
 def flask_config():
     """
     Manually maintained list of Flask configuration values
@@ -351,9 +351,12 @@ def flask_config():
     :rtype: str
     :return: Flask Configuration or None
     """
+
+    # https://flask.palletsprojects.com/en/latest/config/#builtin-configuration-values
     _flask_config = {
         "Builtin": {
             "DEBUG": application.config["DEBUG"],
+            "TESTING": application.config["TESTING"],
             "PROPAGATE_EXCEPTIONS": application.config["PROPAGATE_EXCEPTIONS"],
             "TRAP_HTTP_EXCEPTIONS": application.config["TRAP_HTTP_EXCEPTIONS"],
             "TRAP_BAD_REQUEST_ERRORS": application.config["TRAP_BAD_REQUEST_ERRORS"],
@@ -364,7 +367,6 @@ def flask_config():
             "SESSION_COOKIE_HTTPONLY": application.config["SESSION_COOKIE_HTTPONLY"],
             "SESSION_COOKIE_SECURE": application.config["SESSION_COOKIE_SECURE"],
             "SESSION_COOKIE_SAMESITE": application.config["SESSION_COOKIE_SAMESITE"],
-            "TESTING": application.config["TESTING"],
             "USE_X_SENDFILE": application.config["USE_X_SENDFILE"],
             "SEND_FILE_MAX_AGE_DEFAULT": application.config["SEND_FILE_MAX_AGE_DEFAULT"],
             "SERVER_NAME": application.config["SERVER_NAME"],
@@ -375,19 +377,13 @@ def flask_config():
             "EXPLAIN_TEMPLATE_LOADING": application.config["EXPLAIN_TEMPLATE_LOADING"],
             "MAX_COOKIE_SIZE": application.config["MAX_COOKIE_SIZE"]
         },
-        "Deprecated": {
-            "ENV": application.config["ENV"],
-            "JSON_AS_ASCII": application.config["JSON_AS_ASCII"],
-            "JSON_SORT_KEYS": application.config["JSON_SORT_KEYS"],
-            "JSONIFY_MIMETYPE": application.config["JSONIFY_MIMETYPE"],
-            "JSONIFY_PRETTYPRINT_REGULAR": application.config["JSONIFY_PRETTYPRINT_REGULAR"]
-        },
         "Application": {
             "MONGO_URI": application.config["MONGO_URI"],
             "MONGO_DB": application.config["MONGO_DB"]
         },
         "Description": "Manually maintained list of Flask configuration values"
     }
+
     return jsonify(_flask_config), 200
 
 
