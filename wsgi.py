@@ -347,57 +347,35 @@ def test_icons():
 @application.route('/flask-config')
 def flask_config():
     """
-    Manually maintained list of Flask configuration values
+    Automatically generated list of Flask configuration values
 
     :rtype: str
     :return: Flask Configuration or None
     """
 
     # https://flask.palletsprojects.com/en/latest/config/#builtin-configuration-values
-
-    _inbuilt = {}
-    _inbuilt["DEBUG"] = application.config["DEBUG"]
-    _inbuilt["TESTING"] = application.config["TESTING"]
-    _inbuilt["PROPAGATE_EXCEPTIONS"] = application.config["PROPAGATE_EXCEPTIONS"]
-    _inbuilt["TRAP_HTTP_EXCEPTIONS"] = application.config["TRAP_HTTP_EXCEPTIONS"]
-    _inbuilt["TRAP_BAD_REQUEST_ERRORS"] = application.config["TRAP_BAD_REQUEST_ERRORS"]
-    _inbuilt["SECRET_KEY"] = application.config["SECRET_KEY"]
-    _inbuilt["SESSION_COOKIE_NAME"] = application.config["SESSION_COOKIE_NAME"]
-    _inbuilt["SESSION_COOKIE_DOMAIN"] = application.config["SESSION_COOKIE_DOMAIN"]
-    _inbuilt["SESSION_COOKIE_PATH"] = application.config["SESSION_COOKIE_PATH"]
-    _inbuilt["SESSION_COOKIE_HTTPONLY"] = application.config["SESSION_COOKIE_HTTPONLY"]
-    _inbuilt["SESSION_COOKIE_SECURE"] = application.config["SESSION_COOKIE_SECURE"]
-    _inbuilt["SESSION_COOKIE_SAMESITE"] = application.config["SESSION_COOKIE_SAMESITE"]
-    _inbuilt["USE_X_SENDFILE"] = application.config["USE_X_SENDFILE"]
-    _inbuilt["SEND_FILE_MAX_AGE_DEFAULT"] = application.config["SEND_FILE_MAX_AGE_DEFAULT"]
-    _inbuilt["SERVER_NAME"] = application.config["SERVER_NAME"]
-    _inbuilt["APPLICATION_ROOT"] = application.config["APPLICATION_ROOT"]
-    _inbuilt["PREFERRED_URL_SCHEME"] = application.config["PREFERRED_URL_SCHEME"]
-    _inbuilt["MAX_CONTENT_LENGTH"] = application.config["MAX_CONTENT_LENGTH"]
-    _inbuilt["TEMPLATES_AUTO_RELOAD"] = application.config["TEMPLATES_AUTO_RELOAD"]
-    _inbuilt["EXPLAIN_TEMPLATE_LOADING"] = application.config["EXPLAIN_TEMPLATE_LOADING"]
-    _inbuilt["MAX_COOKIE_SIZE"] = application.config["MAX_COOKIE_SIZE"]
-
-    _database = {}
-    _database["MONGO_URI"] = application.config["MONGO_URI"],
-    _database["MONGO_DB"] = application.config["MONGO_DB"]
+    # need to convert 'value' to string for JSON and organize
+    _flask_cfg = {}
+    _bootstrap_cfg = {}
+    _wtf_cfg = {}
+    _database_cfg = {}
+    for key, value in application.config.items():
+        if key.startswith('BOOTSTRAP'):
+            _bootstrap_cfg[key] = str(value)
+        elif key.startswith('WTF'):
+                _wtf_cfg[key] = str(value)
+        elif key.startswith('MONGO') or key.startswith('SQLALCHEMY'):
+            _database_cfg[key] = str(value)
+        else:
+            _flask_cfg[key] = str(value)
 
     _flask_config = {}
-    _flask_config["Builtin"] = _inbuilt
-    _flask_config["Database"] = _database
-    _flask_config["Description"] = "Manually maintained list of Flask configuration values"
+    _flask_config['Flask'] = _flask_cfg
+    _flask_config['Bootstrap'] = _bootstrap_cfg
+    _flask_config['WTF'] = _wtf_cfg
+    _flask_config['Database'] = _database_cfg
 
-    # return jsonify(_flask_config), 200
-
-    # need to convert 'value' to string for JSON
-    _cfg = {}
-    for key, value in application.config.items():
-        if key == 'PERMANENT_SESSION_LIFETIME':
-            _cfg[key] = str(value)
-        else:
-            _cfg[key] = str(value)
-
-    return jsonify(_cfg), 200
+    return jsonify(_flask_config), 200
 
 
 @application.route('/login', methods=['GET', 'POST'])
