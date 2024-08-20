@@ -1,3 +1,4 @@
+import json
 import uuid
 
 import requests
@@ -386,7 +387,17 @@ def flask_config():
     _flask_config["Database"] = _database
     _flask_config["Description"] = "Manually maintained list of Flask configuration values"
 
-    return jsonify(_flask_config), 200
+    # return jsonify(_flask_config), 200
+
+    # need to convert 'value' to string for JSON
+    _cfg = {}
+    for key, value in application.config.items():
+        if key == 'PERMANENT_SESSION_LIFETIME':
+            _cfg[key] = str(value)
+        else:
+            _cfg[key] = str(value)
+
+    return jsonify(_cfg), 200
 
 
 @application.route('/login', methods=['GET', 'POST'])
