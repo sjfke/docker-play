@@ -1,4 +1,3 @@
-import json
 import uuid
 
 import requests
@@ -245,13 +244,13 @@ def test_bootswatch():
     form = BootswatchForm()
     if form.validate_on_submit():
         if form.theme_name.data == 'default':
-            app.config['BOOTSTRAP_BOOTSWATCH_THEME'] = None
+            application.config['BOOTSTRAP_BOOTSWATCH_THEME'] = None
         else:
-            app.config['BOOTSTRAP_BOOTSWATCH_THEME'] = form.theme_name.data
+            application.config['BOOTSTRAP_BOOTSWATCH_THEME'] = form.theme_name.data
         flash(f'Render style has been set to {form.theme_name.data}.')
     else:
-        if app.config['BOOTSTRAP_BOOTSWATCH_THEME'] != None:
-            form.theme_name.data = app.config['BOOTSTRAP_BOOTSWATCH_THEME']
+        if application.config['BOOTSTRAP_BOOTSWATCH_THEME'] != None:
+            form.theme_name.data = application.config['BOOTSTRAP_BOOTSWATCH_THEME']
     return render_template('bootswatch.html', form=form)
 
 
@@ -369,11 +368,7 @@ def flask_config():
         else:
             _flask_cfg[key] = str(value)
 
-    _flask_config = {}
-    _flask_config['Flask'] = _flask_cfg
-    _flask_config['Bootstrap'] = _bootstrap_cfg
-    _flask_config['WTF'] = _wtf_cfg
-    _flask_config['Database'] = _database_cfg
+    _flask_config = {'Flask': _flask_cfg, 'Bootstrap': _bootstrap_cfg, 'WTF': _wtf_cfg, 'Database': _database_cfg}
 
     return jsonify(_flask_config), 200
 
