@@ -40,7 +40,10 @@ application.secret_key = 'dev'
 application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
 
-# set default button sytle and size, will be overwritten by macro parameters
+# Use local bootstrap files not CDN
+application.config['BOOTSTRAP_SERVE_LOCAL'] = True
+
+# set default button style and size, will be overwritten by macro parameters
 application.config['BOOTSTRAP_BTN_STYLE'] = 'primary'
 application.config['BOOTSTRAP_BTN_SIZE'] = 'sm'
 
