@@ -414,6 +414,29 @@ def question1():
     return jsonify(_dict), 200
 
 
+@application.route('/question')
+def question():
+    import json
+
+    # "name": "quizA"
+    _quiz = "QIZ-3021178c-c430-4285-bed2-114dfe4db9df"
+    # "name": "quizB"
+    # _quiz = "QIZ-d1e25109-ef1d-429c-9595-0fbf820ced86"
+    # "name": "quizC"
+    # _quiz = "QIZ-74751363-3db2-4a82-b764-09de11b65cd6"
+
+    _collection = _db.quizzes
+    # db.collection.find_one() returns a Dict: {"data": [{...},{...},{...}]}
+    _dict= _collection.find_one({'qzid': _quiz}, {'_id': 0, 'data': 1}) # dictionary
+
+    titles = [('label', 'Label'), ('opt1', 'Masculine'), ('opt2', 'Feminine'), ('opt3', 'Neuter'), ('noun', 'Noun'), ('desc', 'Desc')]
+    data = []
+    for _d in _dict['data']:
+        data.append({'label': _d['Label'], 'opt1': _d['Opt1'], 'opt2': _d['Opt2'], 'opt3': _d['Opt3'], 'noun': _d['Noun'], 'desc': _d['Desc']})
+
+    return render_template('question.html', titles=titles, data=data, table_name='Quiz A')
+
+
 @application.route('/data')
 def pirate():
     return render_template("deutsch.json")
