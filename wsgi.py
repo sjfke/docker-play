@@ -399,25 +399,31 @@ def logout():
 
 @application.route('/question')
 def question():
-    import json
 
+    # https://en.wikipedia.org/wiki/NATO_phonetic_alphabet
+
+    #_quiz_name = "Quiz Alfa"
     # "name": "quizA"
-    _quiz = "QIZ-3021178c-c430-4285-bed2-114dfe4db9df"
+    #_quiz = "QIZ-3021178c-c430-4285-bed2-114dfe4db9df"
+
+    # _quiz_name = "Quiz Bravo"
     # "name": "quizB"
     # _quiz = "QIZ-d1e25109-ef1d-429c-9595-0fbf820ced86"
+
+    _quiz_name = "Quiz Charlie"
     # "name": "quizC"
-    # _quiz = "QIZ-74751363-3db2-4a82-b764-09de11b65cd6"
+    _quiz = "QIZ-74751363-3db2-4a82-b764-09de11b65cd6"
 
     _collection = _db.quizzes
     # db.collection.find_one() returns a Dict: {"data": [{...},{...},{...}]}
     _dict= _collection.find_one({'qzid': _quiz}, {'_id': 0, 'data': 1}) # dictionary
 
-    titles = [('label', 'Label'), ('opt1', 'Masculine'), ('opt2', 'Feminine'), ('opt3', 'Neuter'), ('noun', 'Noun'), ('desc', 'Desc')]
+    titles = [('label', 'Question'), ('opt1', 'Masculine'), ('opt2', 'Feminine'), ('opt3', 'Neuter'), ('noun', 'Noun'), ('desc', 'Desc')]
     data = []
     for _d in _dict['data']:
         data.append({'label': _d['Label'], 'opt1': _d['Opt1'], 'opt2': _d['Opt2'], 'opt3': _d['Opt3'], 'noun': _d['Noun'], 'desc': _d['Desc']})
 
-    return render_template('question.html', titles=titles, data=data, table_name='Quiz A')
+    return render_template('question.html', titles=titles, data=data, quiz_name=_quiz_name)
 
 
 @application.route('/data')
