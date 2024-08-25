@@ -397,23 +397,6 @@ def logout():
     return redirect(url_for('index'))
 
 
-@application.route('/question1')
-def question1():
-    # "name": "quizA"
-    _quiz = "QIZ-3021178c-c430-4285-bed2-114dfe4db9df"
-    # "name": "quizB"
-    # _quiz = "QIZ-d1e25109-ef1d-429c-9595-0fbf820ced86"
-    # "name": "quizC"
-    # _quiz = "QIZ-74751363-3db2-4a82-b764-09de11b65cd6"
-
-    _collection = _db.quizzes
-    # db.collection.find_one() returns a Dict: {"data": [{...},{...},{...}]}
-    _dict = _collection.find_one({'qzid': _quiz}, {'_id': 0, 'data': 1})
-    if _dict:
-        return render_template("question1.html", data=_dict["data"])  # need data array
-    return jsonify(_dict), 200
-
-
 @application.route('/question')
 def question():
     import json
