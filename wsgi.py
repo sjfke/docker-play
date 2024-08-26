@@ -5,7 +5,8 @@ from enum import Enum
 from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, abort, session
 from markupsafe import Markup, escape
 from flask_wtf import FlaskForm, CSRFProtect
-from wtforms.validators import DataRequired, Length, Regexp
+from wtforms.validators import DataRequired, Length, Regexp, EqualTo
+# from wtforms import Form, BooleanField, StringField, PasswordField, validators
 from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 from flask_sqlalchemy import SQLAlchemy
@@ -215,6 +216,15 @@ with application.app_context():
     db.session.commit()
 
 
+class RegistrationForm(FlaskForm):
+    email = StringField('Email Address', validators=[DataRequired(), Length(6, 35)])
+    password = PasswordField('Password', validators=[DataRequired(), Length(8, 150), EqualTo('confirm')])
+    confirm = PasswordField('Repeat Password')
+    remember = BooleanField('Remember me')
+    accept_tos = BooleanField('I accept the TOS', validators=[DataRequired()])
+    submit = SubmitField()
+
+
 @application.route('/')
 def index():
     return render_template('index.html')
@@ -278,7 +288,7 @@ def test_flash():
     flash('A simple dark alert—check it out!', 'dark')
     flash(Markup(
         'A simple success alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like.'),
-          'success')
+        'success')
     return render_template('flash.html')
 
 
@@ -365,7 +375,7 @@ def flask_config():
         if key.startswith('BOOTSTRAP'):
             _bootstrap_cfg[key] = str(value)
         elif key.startswith('WTF'):
-                _wtf_cfg[key] = str(value)
+            _wtf_cfg[key] = str(value)
         elif key.startswith('MONGO') or key.startswith('SQLALCHEMY'):
             _database_cfg[key] = str(value)
         else:
@@ -387,7 +397,22 @@ def login():
         session['theme'] = 'hootstrap'  # 'hootstrap', 'fresca', 'herbie'
         return redirect(url_for('index'))
     else:
-        return render_template("login.html")
+        return render_template("old-registration.html")
+
+
+@application.route('/registration', methods=['GET', 'POST'])
+def registration():
+    _form = RegistrationForm()
+    # https://flask.palletsprojects.com/en/2.2.x/config/#SECRET_KEY
+    if _form.validate_on_submit():
+        data = request.form
+        return jsonify(data), 200
+        # session['username'] = request.form['username']
+        # session['cif'] = '919ae5a5-34e4-4b88-979a-5187d46d1617'
+        # session['theme'] = 'hootstrap'  # 'hootstrap', 'fresca', 'herbie'
+        # return redirect(url_for('index'))
+    else:
+        return render_template('registration.html', form=_form, action='/registration', method='post')
 
 
 @application.route('/logout')
@@ -399,12 +424,11 @@ def logout():
 
 @application.route('/question')
 def question():
-
     # https://en.wikipedia.org/wiki/NATO_phonetic_alphabet
 
-    #_quiz_name = "Quiz Alfa"
+    # _quiz_name = "Quiz Alfa"
     # "name": "quizA"
-    #_quiz = "QIZ-3021178c-c430-4285-bed2-114dfe4db9df"
+    # _quiz = "QIZ-3021178c-c430-4285-bed2-114dfe4db9df"
 
     # _quiz_name = "Quiz Bravo"
     # "name": "quizB"
@@ -416,12 +440,15 @@ def question():
 
     _collection = _db.quizzes
     # db.collection.find_one() returns a Dict: {"data": [{...},{...},{...}]}
-    _dict= _collection.find_one({'qzid': _quiz}, {'_id': 0, 'data': 1}) # dictionary
+    _dict = _collection.find_one({'qzid': _quiz}, {'_id': 0, 'data': 1})  # dictionary
 
-    titles = [('label', 'Question'), ('opt1', 'Masculine'), ('opt2', 'Feminine'), ('opt3', 'Neuter'), ('noun', 'Noun'), ('desc', 'Desc')]
+    titles = [('label', 'Question'), ('opt1', 'Masculine'), ('opt2', 'Feminine'), ('opt3', 'Neuter'), ('noun', 'Noun'),
+              ('desc', 'Desc')]
     data = []
     for _d in _dict['data']:
-        data.append({'label': _d['Label'], 'opt1': _d['Opt1'], 'opt2': _d['Opt2'], 'opt3': _d['Opt3'], 'noun': _d['Noun'], 'desc': _d['Desc']})
+        data.append(
+            {'label': _d['Label'], 'opt1': _d['Opt1'], 'opt2': _d['Opt2'], 'opt3': _d['Opt3'], 'noun': _d['Noun'],
+             'desc': _d['Desc']})
 
     return render_template('question.html', titles=titles, data=data, quiz_name=_quiz_name)
 
