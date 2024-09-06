@@ -1,16 +1,15 @@
 import uuid
+from enum import Enum
 
 import requests
-from enum import Enum
 from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, abort, session
-from markupsafe import Markup, escape
-from flask_wtf import FlaskForm, CSRFProtect
-from wtforms.validators import DataRequired, Length, Regexp, EqualTo
-# from wtforms import Form, BooleanField, StringField, PasswordField, validators
-from wtforms.fields import *
 from flask_bootstrap import Bootstrap5, SwitchField
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import FlaskForm, CSRFProtect
+from markupsafe import Markup, escape
 from pymongo import MongoClient
+from wtforms.fields import *
+from wtforms.validators import DataRequired, Length, Regexp, EqualTo, Email, InputRequired
 
 
 def is_valid_uuid4(value):
@@ -36,7 +35,17 @@ def is_valid_uuid4(value):
 
 
 application = Flask(__name__, instance_relative_config=True)
-application.secret_key = 'dev'
+
+# python -c 'import uuid; print(uuid.uuid4().hex)'
+# python -c 'import secrets; print(secrets.token_hex())'
+# python  -c 'import os; print(os.urandom(16).hex())'
+HEX_SECRET_KEY = 'cad2d4ec59b74b9ab55a57cd8df4763b'
+application.secret_key = HEX_SECRET_KEY
+# application.config['SECRET_KEY'] = HEX_SECRET_KEY # configuration alternative
+# from os import urandom
+# application.secret_key = urandom(16).hex()
+# application.secret_key = 'dev'
+application.config['SESSION_COOKIE_NAME'] = 'flask-play' # default 'session'
 
 application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
@@ -54,12 +63,8 @@ application.config['BOOTSTRAP_TABLE_EDIT_TITLE'] = 'Update'
 application.config['BOOTSTRAP_TABLE_DELETE_TITLE'] = 'Remove'
 application.config['BOOTSTRAP_TABLE_NEW_TITLE'] = 'Create'
 
-# Enable encrypted session (cookies) so can map user login to CIF, CIF-919ae5a5-34e4-4b88-979a-5187d46d1617
-# Login/password authentication will be via flask-alchemy to MariaDB which will map to CIF
-# CIF is required to get list of Questions, Quizzes and Results
-#  python -c 'import secrets; print(secrets.token_hex())'
-# application.config['SECRET_KEY'] = '87ef122423ce0f61e47bddb08e44b347c5cf1fd6a85f7a34162369f4ac4ef999'
-# application.config['SESSION_COOKIE_NAME'] = 'flask-play'
+
+application.config['WTF_CSRF_SECRET_KEY'] = 'bb5951a47f9442b8a3077f44f6a9b202' # Defaults to session SECRET_KEY
 
 # clean-up: https://pymongo.readthedocs.io/en/stable/examples/authentication.html
 application.config["MONGO_URI"] = "mongodb://root:example@mongo:27017"
@@ -217,11 +222,11 @@ with application.app_context():
 
 
 class RegistrationForm(FlaskForm):
-    email = StringField('Email Address', validators=[DataRequired(), Length(6, 35)])
-    password = PasswordField('Password', validators=[DataRequired(), Length(8, 150), EqualTo('confirm')])
-    confirm = PasswordField('Repeat Password')
+    email = StringField('Email Address', validators=[DataRequired(), Email(), Length(6, 35)])
+    password = PasswordField('Password', validators=[DataRequired(), Length(8, 150)])
+    confirm = PasswordField('Repeat Password', validators=[DataRequired(), Length(8, 150), EqualTo('password')])
     remember = BooleanField('Remember me')
-    accept_tos = BooleanField('I accept the TOS', validators=[DataRequired()])
+    accept_tos = BooleanField('I accept the TOS', validators=[InputRequired()])
     submit = SubmitField()
 
 
@@ -232,13 +237,13 @@ def index():
 
 @application.route('/form', methods=['GET', 'POST'])
 def test_form():
-    form = HelloForm()
-    if form.validate_on_submit():
+    _form = HelloForm()
+    if _form.validate_on_submit():
         flash('Form validated!')
         return redirect(url_for('index'))
     return render_template(
         'form.html',
-        form=form,
+        form=_form,
         telephone_form=TelephoneForm(),
         contact_form=ContactForm(),
         im_form=IMForm(),
@@ -262,7 +267,7 @@ def test_bootswatch():
             application.config['BOOTSTRAP_BOOTSWATCH_THEME'] = form.theme_name.data
         flash(f'Render style has been set to {form.theme_name.data}.')
     else:
-        if application.config['BOOTSTRAP_BOOTSWATCH_THEME'] != None:
+        if application.config['BOOTSTRAP_BOOTSWATCH_THEME'] is not None:
             form.theme_name.data = application.config['BOOTSTRAP_BOOTSWATCH_THEME']
     return render_template('bootswatch.html', form=form)
 
