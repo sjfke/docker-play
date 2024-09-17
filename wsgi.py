@@ -6,6 +6,7 @@ from flask import Flask, render_template, request, flash, redirect, url_for, jso
 from flask_bootstrap import Bootstrap5, SwitchField
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm, CSRFProtect
+from flask_babel import Babel
 from markupsafe import Markup, escape
 from pymongo import MongoClient
 from wtforms.fields import *
@@ -63,7 +64,6 @@ application.config['BOOTSTRAP_TABLE_EDIT_TITLE'] = 'Update'
 application.config['BOOTSTRAP_TABLE_DELETE_TITLE'] = 'Remove'
 application.config['BOOTSTRAP_TABLE_NEW_TITLE'] = 'Create'
 
-
 application.config['WTF_CSRF_SECRET_KEY'] = 'bb5951a47f9442b8a3077f44f6a9b202' # Defaults to session SECRET_KEY
 
 # clean-up: https://pymongo.readthedocs.io/en/stable/examples/authentication.html
@@ -75,6 +75,7 @@ _db = _client[application.config["MONGO_DB"]]
 bootstrap = Bootstrap5(application)
 db = SQLAlchemy(application)
 csrf = CSRFProtect(application)
+babel = Babel(application)
 
 
 class ExampleForm(FlaskForm):
@@ -325,7 +326,7 @@ def edit_message(message_id):
     if message:
         message.draft = not message.draft
         db.session.commit()
-        return f'Message {message_id} has been editted by toggling draft status. Return to <a href="/table">table</a>.'
+        return f'Message {message_id} has been edited by toggling draft status. Return to <a href="/table">table</a>.'
     return f'Message {message_id} did not exist and could therefore not be edited. Return to <a href="/table">table</a>.'
 
 
