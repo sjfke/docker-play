@@ -428,8 +428,8 @@ def logout():
     return redirect(url_for('index'))
 
 
-@application.route('/question')
-def question():
+@application.route('/question-table')
+def question_table():
     # https://en.wikipedia.org/wiki/NATO_phonetic_alphabet
 
     # _quiz_name = "Quiz Alfa"
@@ -456,7 +456,7 @@ def question():
             {'label': _d['Label'], 'opt1': _d['Opt1'], 'opt2': _d['Opt2'], 'opt3': _d['Opt3'], 'noun': _d['Noun'],
              'desc': _d['Desc']})
 
-    return render_template('question.html', titles=titles, data=data, quiz_name=_quiz_name)
+    return render_template('question-table.html', titles=titles, data=data, quiz_name=_quiz_name)
 
 
 @application.route('/data')

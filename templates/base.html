@@ -21,7 +21,7 @@
             margin: 20px;
         }
     </style>
-    {% endblock %}
+    {% endblock head %}
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
@@ -55,7 +55,7 @@
 
 <main class="container">
     {{ render_messages(container=False, dismissible=True, dismiss_animate=True) }}
-    {% block content %}{% endblock %}
+    {% block content %}{% endblock content %}
 </main>
 
 <footer class="text-center">
