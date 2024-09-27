@@ -10,7 +10,7 @@ from flask_babel import Babel
 from markupsafe import Markup, escape
 from pymongo import MongoClient
 from wtforms.fields import *
-from wtforms.validators import DataRequired, Length, Regexp, EqualTo, Email, InputRequired
+from wtforms.validators import DataRequired, Length, Regexp, EqualTo, Email, InputRequired, ReadOnly, Disabled
 
 
 def is_valid_uuid4(value):
@@ -46,7 +46,7 @@ application.secret_key = HEX_SECRET_KEY
 # from os import urandom
 # application.secret_key = urandom(16).hex()
 # application.secret_key = 'dev'
-application.config['SESSION_COOKIE_NAME'] = 'flask-play' # default 'session'
+application.config['SESSION_COOKIE_NAME'] = 'flask-play'  # default 'session'
 
 application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
@@ -64,7 +64,7 @@ application.config['BOOTSTRAP_TABLE_EDIT_TITLE'] = 'Update'
 application.config['BOOTSTRAP_TABLE_DELETE_TITLE'] = 'Remove'
 application.config['BOOTSTRAP_TABLE_NEW_TITLE'] = 'Create'
 
-application.config['WTF_CSRF_SECRET_KEY'] = 'bb5951a47f9442b8a3077f44f6a9b202' # Defaults to session SECRET_KEY
+application.config['WTF_CSRF_SECRET_KEY'] = 'bb5951a47f9442b8a3077f44f6a9b202'  # Defaults to session SECRET_KEY
 
 # clean-up: https://pymongo.readthedocs.io/en/stable/examples/authentication.html
 application.config["MONGO_URI"] = "mongodb://root:example@mongo:27017"
@@ -231,6 +231,14 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField()
 
 
+class QuestionForm(FlaskForm):
+    email = StringField('Email Address', validators=[DataRequired(), Email(), Length(8, 40)])
+    remember = BooleanField('Remember me')
+    accept_tos = BooleanField('I accept the TOS', validators=[InputRequired()])
+    readonlyField = StringField("Readonly field", default='Read Only', validators=[ReadOnly()])
+    submit = SubmitField()
+
+
 @application.route('/')
 def index():
     return render_template('index.html')
@@ -260,17 +268,17 @@ def test_nav():
 
 @application.route('/bootswatch', methods=['GET', 'POST'])
 def test_bootswatch():
-    form = BootswatchForm()
-    if form.validate_on_submit():
-        if form.theme_name.data == 'default':
+    _form = BootswatchForm()
+    if _form.validate_on_submit():
+        if _form.theme_name.data == 'default':
             application.config['BOOTSTRAP_BOOTSWATCH_THEME'] = None
         else:
-            application.config['BOOTSTRAP_BOOTSWATCH_THEME'] = form.theme_name.data
-        flash(f'Render style has been set to {form.theme_name.data}.')
+            application.config['BOOTSTRAP_BOOTSWATCH_THEME'] = _form.theme_name.data
+        flash(f'Render style has been set to {_form.theme_name.data}.')
     else:
         if application.config['BOOTSTRAP_BOOTSWATCH_THEME'] is not None:
-            form.theme_name.data = application.config['BOOTSTRAP_BOOTSWATCH_THEME']
-    return render_template('bootswatch.html', form=form)
+            _form.theme_name.data = application.config['BOOTSTRAP_BOOTSWATCH_THEME']
+    return render_template('bootswatch.html', form=_form)
 
 
 @application.route('/pagination', methods=['GET', 'POST'])
@@ -426,6 +434,30 @@ def logout():
     # remove the username from the session if it's there
     session.pop('username', None)
     return redirect(url_for('index'))
+
+
+@application.route('/question-form', methods=['GET', 'POST'])
+def question_form():
+    _form = QuestionForm()
+    if _form.validate_on_submit():
+        data = request.form
+        return jsonify(data), 200
+        # flash('Form validated!')
+        # return redirect(url_for('index'))
+
+    # _form.question = 'Q01'
+    # _form.noun = 'Laptop'
+    # _form.descr = 'Laptop'
+    # {
+    #     "Noun": "Laptop",
+    #     "Ans": "der",
+    #     "Opt1": "der",
+    #     "Opt2": "die",
+    #     "Opt3": "das",
+    #     "Plural": "Laptops",
+    #     "Desc": "Laptop"
+    # },
+    return render_template('question-form.html', form=_form, action='/question-form', method='post')
 
 
 @application.route('/question-table')
